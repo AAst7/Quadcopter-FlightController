@@ -59,6 +59,43 @@
 
 ---
 
+## 原理图和 PCB 图
+
+原理图与 PCB 均为本次重画，已投板打样。图片为嘉立创 EDA 导出的原始设计文件截图。
+
+### 遥控端
+
+**原理图**
+
+<img src="Controller/SCH_遥控原理图.png" width="900" alt="遥控端原理图">
+
+**PCB 顶层**
+
+<img src="Controller/PCB_遥控PCB_顶层.png" width="900" alt="遥控端 PCB 顶层">
+
+**PCB 底层**
+
+<img src="Controller/PCB_遥控PCB_底层.png" width="900" alt="遥控端 PCB 底层">
+
+### 飞控端
+
+原理图按功能块分区绘制：供电充电、电源（升压 + 3.3V LDO）、陀螺仪、电机驱动、
+无线射频、OLED 显示、下载与串口。
+
+**原理图**
+
+<img src="FlightControl/SCH_飞控原理图.png" width="900" alt="飞控端原理图">
+
+**PCB 顶层**
+
+<img src="FlightControl/PCB_飞控PCB_顶层.png" width="900" alt="飞控端 PCB 顶层">
+
+**PCB 底层**
+
+<img src="FlightControl/PCB_飞控PCB_底层.png" width="900" alt="飞控端 PCB 底层">
+
+---
+
 ## 本次完成的技术工作
 
 ### 1. 工程重构：SPL → CubeMX + HAL
