@@ -1,0 +1,39 @@
+# ---- Keil MDK 构建输出 ----
+MDK-ARM/*/
+!MDK-ARM/DebugConfig/
+!MDK-ARM/RTE/
+*.o
+*.d
+*.crf
+*.dep
+*.axf
+*.elf
+*.hex
+*.bin
+*.lst
+*.map
+*.htm
+*.build_log.htm
+*.bak
+*.scvd
+JLinkLog.txt
+JLinkSettings.ini
+
+# ---- Keil 用户配置（含本机路径，不应提交）----
+*.uvguix.*
+*.uvoptx
+
+# ---- Keil 器件包缓存 ----
+.pack/
+
+# ---- CubeMX ----
+.mxproject
+*.mxproject
+
+# ---- VS Code ----
+.vscode/
+
+# ---- 杂项 ----
+Thumbs.db
+Desktop.ini
+*.zip
