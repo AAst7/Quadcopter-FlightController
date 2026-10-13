@@ -1,4 +1,4 @@
-﻿#ifndef __VARIABLE_H__
+#ifndef __VARIABLE_H__
 #define __VARIABLE_H__
 
 #include "stm32f1xx_hal.h"
@@ -72,6 +72,12 @@ extern uint8_t Key;
 /*连接保护功能*/
 extern uint8_t connect_value;
 extern uint16_t connect_time;
+extern uint8_t Send_Status;      //NRF发送状态: TX_OK为联通, MAX_TX为无应答
+extern uint8_t NRF_StatusRaw;    //诊断: STATUS寄存器原始值
+extern uint8_t NRF_ConfigRaw;    //诊断: CONFIG寄存器读回值
+extern uint8_t NRF_FifoRaw;      //诊断: FIFO_STATUS寄存器值
+extern uint8_t NRF_FifoIn;       //诊断: 写payload后的FIFO状态
+extern uint8_t NRF_StRaw2;       //诊断: CE触发后STATUS
 
 /*电量检测*/
 extern float Battery_Value;

@@ -1,6 +1,7 @@
 #include "Variable.h"
 #include "Delay.h"
 #include "NRF24L01.h"
+#include "NRF24L01_Reg.h"
 #include "tim.h"
 #include "OLED.h"
 
@@ -200,6 +201,11 @@ void Data_Display(void)
             }
             OLED_Printf(50,32 ,OLED_8X16,"Enc:L+R-");       //解锁提示
             OLED_Printf(50,48 ,OLED_8X16,"Enc:%d",Yaw_Control-100);		
+            //===== NRF联通状态显示: TX_OK(32)=已联通, MAX_TX(16)=未收到应答 =====
+            if(Send_Status == TX_OK)
+                OLED_ShowString(80,40,"S:OK",OLED_6X8);
+            else
+                OLED_Printf(80,40,OLED_6X8,"S:%d",Send_Status);
             OLED_Update();	
             break;
         
@@ -394,7 +400,7 @@ void Data_Send(void)        //发送9个
     Send_Data[7] = PID_Data_Send[0];//浮点数的整数
     Send_Data[8] = PID_Data_Send[1];//浮点数的小数
 
-    Send(Send_Data);            //NRF24L01发送数据
+    Send_Status = Send(Send_Data);   //NRF24L01发送数据，保存状态用于显示联通与否
 }
 
 
@@ -405,16 +411,3 @@ void Data_Receive(void)      //接收数据
         Receive_NRF24L01_Data(Receive_Data);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

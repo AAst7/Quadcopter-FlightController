@@ -108,7 +108,7 @@ int main(void)
   
   DWT_Init();
   OLED_Init();
-  // NRF24L01_Init();   -----------------暂时注释
+  NRF24L01_Init();           // 第②步: 只加回初始化, 暂不发送, 看是否黑屏
   OLED_Init();
   
   // OLED_Update();
@@ -135,11 +135,11 @@ int main(void)
       Data_Display();
       Disp_Slow_time = 1;
     }
-    // if(Send_Slow_time == 0)    //发送消息------------------暂时注释
-    // {
-    //   Data_Send();
-    //   Send_Slow_time = 1;
-    // }
+    if(Send_Slow_time == 0)    //发送消息------------------暂时注释
+    {
+      Data_Send();           // 第③步: 打开发送, 定位黑屏是否由此引起
+      Send_Slow_time = 1;
+    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -236,4 +236,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-

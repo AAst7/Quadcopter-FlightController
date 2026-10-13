@@ -1,4 +1,4 @@
-﻿/*该文件定义所以相关的变量，并允许对外引用*/
+/*该文件定义所以相关的变量，并允许对外引用*/
 #include "Variable.h"                 // Device header
 
 /*-------------------变量-------------------*/
@@ -55,6 +55,12 @@ uint8_t Key_LED=7;
 /*连接保护功能*/
 uint8_t connect_value;
 uint16_t connect_time;
+uint8_t Send_Status;    //NRF发送状态: TX_OK为联通, MAX_TX为无应答
+uint8_t NRF_StatusRaw;  //诊断: STATUS寄存器原始值
+uint8_t NRF_ConfigRaw;  //诊断: CONFIG寄存器读回值
+uint8_t NRF_FifoRaw;    //诊断: FIFO_STATUS寄存器值(发送后)
+uint8_t NRF_FifoIn;     //诊断: 写入payload后的FIFO状态(验证数据是否进缓冲)
+uint8_t NRF_StRaw2;     //诊断: CE触发+等待后的STATUS(验证是否产生中断标志)
 
 /*电量检测*/
 float Battery_Value;

@@ -1,7 +1,8 @@
-﻿#include "stm32f1xx_hal.h"
+#include "stm32f1xx_hal.h"
 #include "NRF24L01_Reg.h"
 #include "MySPI.h"
 #include "Delay.h"
+#include "Variable.h"
 
 uint8_t T_ADDR[5]={0xF0,0xF0,0xF0,0xF0,0xF0};
 uint8_t R_ADDR[5]={0xF0,0xF0,0xF0,0xF0,0xF0};
@@ -104,7 +105,7 @@ void Receive_NRF24L01_Data(uint8_t *buf)      //读取数据
     {
         Receive_NRF24L01_Buf(R_REGISTER+R_RX_PAYLOAD,buf,9);
         NRF24L01_WriteVal(FLUSH_RX,NOP);                //清除接收寄存器标志位
-        NRF24L01_WriteVal(W_REGISTER+STATUS,status);    //清除中断
+         NRF24L01_WriteVal(W_REGISTER+STATUS,status);    //清除中断
         Delay_us(150);
     }
 
@@ -114,13 +115,25 @@ void Receive_NRF24L01_Data(uint8_t *buf)      //读取数据
 uint8_t Send(uint8_t *buf)          //发送数据
 {
     uint8_t status;
-    NRF24L01_WriteBuf(W_REGISTER+W_TX_PAYLOAD,buf,9);
-    MySPI_W_CE(0);
+    uint16_t cnt = 0;               //超时计数器
+    MySPI_W_CE(0);                  //①先关闭CE,防止残留高电平提前发送
     NRF24L01_WriteVal(W_REGISTER+CONFIG,0x0E);      //配置发送模式
-    MySPI_W_CE(1);
+    NRF24L01_WriteBuf(W_TX_PAYLOAD,buf,9);   //写入payload(W_TX_PAYLOAD本身是完整命令,不能加W_REGISTER)
+    NRF_FifoIn = NRF24L01_ReadVal(R_REGISTER+FIFO_STATUS);   //①写数据后的FIFO
+    MySPI_W_CE(1);                  //②CE拉高触发一次性发送
 
-    while(NRF24L01_ReadIRQ() == 1);                 //等待中断标志位拉低，发送完成
+    //等待中断标志位拉低，发送完成；延时已修复(不依赖DWT),带超时保护
+    while(NRF24L01_ReadIRQ() == 1)
+    {
+        Delay_us(100);
+        cnt++;
+        if(cnt > 100) break;      //约10ms超时，未收到应答或对端未就绪
+    }
     status = NRF24L01_ReadVal(R_REGISTER+STATUS);
+    NRF_StatusRaw = status;     //诊断: 保存STATUS原始值
+    NRF_StRaw2     = status;     //②CE+等待后STATUS
+    NRF_ConfigRaw = NRF24L01_ReadVal(R_REGISTER+CONFIG);     //诊断: 读回CONFIG
+    NRF_FifoRaw   = NRF24L01_ReadVal(R_REGISTER+FIFO_STATUS); //诊断: 读回FIFO状态
     if(status & MAX_TX)                             //如果到达最大重发次数，发送失败
     {
         NRF24L01_WriteVal(FLUSH_TX,NOP);              //清除发送数据缓存器
@@ -135,7 +148,3 @@ uint8_t Send(uint8_t *buf)          //发送数据
     return 0;
 
 }
-
-
-
-
