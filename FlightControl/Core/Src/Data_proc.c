@@ -1,4 +1,4 @@
-﻿#include "NRF24L01.h"
+#include "NRF24L01.h"
 #include "Variable.h"
 #include "main.h"
 #include "Delay.h"
@@ -464,8 +464,9 @@ void Data_Proc(void)
         yaw_gyro_balance_Ki = PID_Data[5][1];
         yaw_gyro_balance_Kd = PID_Data[5][2];
     }
-    //电池检测
-    if(Battery_average <= 3.5) Battery_Protect = 1;
+    //电池检测:低于0.5V认为是没有接电池或分压采样没接通(当前PCB的ADC分压网络未连到电池),
+    //不能当成低电,否则Battery_Protect会长期为1,状态灯被"低电快闪"占用,失去链路指示功能
+    if(Battery_average > 0.5f && Battery_average <= 3.5f) Battery_Protect = 1;
     else Battery_Protect = 0;
 
 }
@@ -506,7 +507,8 @@ void Data_Display(void)
 
 void Date_Receive(void)
 {
-    if(NRF24L01_R_IRQ() == 0)
+    /* 轮询STATUS代替IRQ引脚判断：不依赖IRQ连线，已实测可靠 */
+    if(Read_NRF24L01_Val(R_REGISTER + STATUS) & RX_OK)
     {
         Receive_NRF24L01_Data(Receive_Data);    //接收遥控发来的数据
         Lock = Receive_Data[0];

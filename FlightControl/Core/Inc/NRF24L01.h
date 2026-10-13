@@ -2,6 +2,7 @@
 #define __NRF24L01_H
 
 #include "main.h"
+#include "NRF24L01_Reg.h"      //寄存器/命令宏定义(STATUS/RX_OK/R_REGISTER等)
 
 uint8_t NRF24L01_R_IRQ(void);
 void Write_NRF24L01_Val(uint8_t Reg,uint8_t Value);

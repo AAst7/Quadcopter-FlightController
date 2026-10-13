@@ -231,22 +231,22 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 {
   if(htim->Instance == TIM1)
   {
-    //每6ms接收遥控数据
-    if(++Receive_Slow_time > 6)   Receive_Slow_time = 0;
-    //每20s处理数据
-    if(++Proc_Slow_time > 20)   Proc_Slow_time = 0;
+    //每6ms接收遥控数据(计数器累加到饱和,由main.c清零)
+    if(Receive_Slow_time   < PERIOD_RECEIVE)   Receive_Slow_time++;
+    //每20ms处理数据
+    if(Proc_Slow_time      < PERIOD_PROC)      Proc_Slow_time++;
     //每50ms显示数据
-    if(++Show_Slow_time > 50)   Show_Slow_time = 0;
-    //每4s解析姿态
-    if(++Attitude_Proc_time > 4)   Attitude_Proc_time = 0;
-    //每3ms执行飞控任务
+    if(Show_Slow_time      < PERIOD_SHOW)      Show_Slow_time++;
+    //每4ms解析姿态
+    if(Attitude_Proc_time  < PERIOD_ATTITUDE)  Attitude_Proc_time++;
+    //每3ms执行飞控任务(在中断内闭环,不需要主循环参与)
     if(++Task_Slow_time > 3)
     {
       fly_task();
       Task_Slow_time = 0;
     }
-    //每10ms获取平均电量检测
-    if(++PowerDete_Slow_time > 10)   PowerDete_Slow_time = 0;
+    //每10ms电量采样
+    if(PowerDete_Slow_time < PERIOD_POWER)     PowerDete_Slow_time++;
     //每1ms更新LED
     LED_Detect();
     //每1000ms连接保护

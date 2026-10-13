@@ -1,4 +1,4 @@
-﻿/* USER CODE BEGIN Header */
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c
@@ -102,6 +102,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
+  HAL_ADCEx_Calibration_Start(&hadc1);   //ADC校准:F1必须,否则读数精度差
   MX_TIM1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
@@ -111,6 +112,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
 
   OLED_Init();
+  DWT_Init();        // 必须先启动DWT，否则Delay_us会死循环
   NRF24L01_Init();
   MPU_Init();
   MPU6050_DMP_Init();
@@ -123,35 +125,40 @@ int main(void)
   while (1)
   {
     //获取姿态信息
-    if(Attitude_Proc_time == SlowDown)
+    if(Attitude_Proc_time >= PERIOD_ATTITUDE)
     {
       Attitude_Data_Proc();
-      Attitude_Proc_time = 1;
+      Attitude_Proc_time = 0;
     }
     //接收遥控数据
-    if(Receive_Slow_time == SlowDown)
+    if(Receive_Slow_time >= PERIOD_RECEIVE)
     {
       Date_Receive();
-      Receive_Slow_time = 1;
+      Receive_Slow_time = 0;
     }
     //数据处理加PID
-    if(Proc_Slow_time == SlowDown)
+    if(Proc_Slow_time >= PERIOD_PROC)
     {
       Data_Proc();
-      Proc_Slow_time = 1;
+      Proc_Slow_time = 0;
     }
     //获取平均电量
-    if(PowerDete_Slow_time == SlowDown)
+    if(PowerDete_Slow_time >= PERIOD_POWER)
     {
       GetCurrent_Power();
-      PowerDete_Slow_time = 1;
+      PowerDete_Slow_time = 0;
+    }
+    //数据显示
+    if(Show_Slow_time >= PERIOD_SHOW)
+    {
+      Data_Display();
+      Show_Slow_time = 0;
     }
 
     /* USER CODE END WHILE */
-    SET_Compare1(1000);
-    SET_Compare2(1000);
-    SET_Compare3(1000);
-    SET_Compare4(1000);
+
+    /*电机PWM只由Motor_Control()(1ms中断)写,主循环不要再动比较值,
+      否则两边抢同一个CCR,电机会在0和1000之间乱跳*/
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

@@ -1,12 +1,12 @@
-﻿#include "Variable.h"
+#include "Variable.h"
 #include "main.h"
 #include "adc.h"
 
 uint16_t Get_ADC(void)
 {
-    HAL_ADC_Start(&hadc1);      //开始转换
-    while(HAL_ADC_GetState(&hadc1)!=HAL_ADC_STATE_READY);
-    return HAL_ADC_GetValue(&hadc1);
+    HAL_ADC_Start(&hadc1);                              //启动单次转换
+    HAL_ADC_PollForConversion(&hadc1, 10);              //等转换完成(10ms超时,不会死等)
+    return (uint16_t)HAL_ADC_GetValue(&hadc1);          //读取转换结果
 }
 
 

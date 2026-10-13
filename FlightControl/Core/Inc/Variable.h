@@ -4,7 +4,14 @@
 //将所有的变量放在这里，并允许外部引用
 
 /*-------------------变量-------------------*/
-#define SlowDown 0
+/*主循环任务周期,单位1ms。tim.c按此值把计数器累加到饱和,main.c按此值触发任务并把计数器清零。
+  原来用#define SlowDown 0靠中断把计数器瞬间清0来触发,主循环忙时会漏掉这一次任务,
+  改成饱和计数后计数器会保持到被处理,不会丢任务*/
+#define PERIOD_ATTITUDE   4     //姿态解算周期
+#define PERIOD_RECEIVE    6     //接收遥控数据周期
+#define PERIOD_PROC       20    //数据处理+PID参数周期
+#define PERIOD_POWER      10    //电量采样周期
+#define PERIOD_SHOW       50    //OLED显示周期
 
 #include "main.h"
 
